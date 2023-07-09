@@ -1,0 +1,14 @@
+
+
+# 安装 opencv-python
+conda install py-opencv
+
+
+# 安装 pycryptodome --- 实现了各种哈希算法和加密算法
+pip uninstall pycrypto
+pip install pycryptodome
+
+
+# 完整性校验算法：
+# 分组CRC 然后 SM3
+# CRC 速度快, 但是 SM3 更安全
