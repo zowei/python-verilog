@@ -12,3 +12,5 @@ pip install pycryptodome
 # 完整性校验算法：
 # 分组CRC 然后 SM3
 # CRC 速度快, 但是 SM3 更安全
+
+### 开发
