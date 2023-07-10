@@ -13,4 +13,4 @@ pip install pycryptodome
 # 分组CRC 然后 SM3
 # CRC 速度快, 但是 SM3 更安全
 
-#ksa
+# 10007511 4404 1929 1631
