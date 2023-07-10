@@ -9,7 +9,7 @@ import numpy as np
 import crcmod
 from udp_video.util import GetHostIP
 
-# 定义消息队列，用于存储生产者发送的数据和消费者接收的数据
+# 定义消息队列, 用于存储生产者发送的数据和消费者接收的数据
 msg_queue = queue.Queue()
 
 
@@ -28,6 +28,9 @@ class server(threading.Thread):
                 data, addr = s.recvfrom(800000)
                 # 存放数据到消息队列
                 msg_queue.put((data, addr))
+        except socket.error as e:
+            print("socket 异常", e)
+            exit(1)
         finally:
             s.close()
 
@@ -57,16 +60,17 @@ class consumer(threading.Thread):
             # -----------------加密模块---------------------------#
             # 加密后的数据---0b100110000010001110110110111
             after_crc_32 = binascii.crc32(data) & 0xffffffff
-            print("after crc-32 = ", bin(after_crc_32))
+            print("after crc-32 = ", hex(after_crc_32))
+            # crcmod- 自定义crc算法
+            # crc-32 --- X32+X26+X23+X22+X16+X12+X11+X10+X8+X7+X5+X4+X2+X+1 --- 0x104C11DB7
             crcmod_crc32 = crcmod.mkCrcFun(0x104C11DB7, initCrc=0, xorOut=0xffffffff)
-            print("after crcmod-32 = ", bin(crcmod_crc32(data)))
+            print("after crcmod-32 = ", hex(crcmod_crc32(data)))
             # 处理数据
             np_arr = np.frombuffer(data, np.uint8)
             img_decode = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
             # 一帧一帧保存图片成视频
-            i = cv2.resize(img_decode, (640, 480))
-            v.write(i)
+            v.write(cv2.resize(img_decode, (640, 480)))
 
             # 视频展示
             cv2.startWindowThread()
@@ -74,8 +78,14 @@ class consumer(threading.Thread):
             # 50ms 一张图片, 0.05s 一张图片; 5s一百张图片; 1s20张图;fps=20
             # 计算fps：fps = 1000 / x
             c = cv2.waitKey(20)
-            if c == 27:  # 按了 esc 后可以退出
-                sys.exit(0)
+            try:
+                if c == 27:  # 按了 esc 后可以退出
+                    break
+            except Exception as e:
+                print("中断异常", e)
+                exit(1)
+            finally:
+                exit(1)
 
 
 if __name__ == '__main__':

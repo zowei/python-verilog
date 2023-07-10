@@ -1,4 +1,3 @@
-import re
 import struct
 import zlib
 import binascii
@@ -89,10 +88,9 @@ if __name__ == '__main__':
     crc_stm = reversal_getCrc32(bytearray(buf_s)) & 0xffffffff
     print('反转算出来的CRC值:', '0x' + "{:0>8s}".format(str('%x' % crc_stm)))
 
-    """
-    当前CRC输入初始值： (b'\x00\x00\x01\x90', <class 'bytes'>)
-    算出来的CRC值: 0xc8507d19
-    算出来的CRC值: 0xc8507d19    
-    算出来的CRC值: 0xc8507d19
-    反转算出来的CRC值: 0xc8507d19
-    """
+    # 当前CRC输入初始值： (b'\x00\x00\x01\x90', <class 'bytes'>)
+    # 算出来的CRC值: 0xc8507d19
+    # 算出来的CRC值: 0xc8507d19
+    # 算出来的CRC值: 0xc8507d19
+    # 反转算出来的CRC值: 0xc8507d19
+

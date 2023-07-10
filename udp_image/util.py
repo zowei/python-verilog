@@ -20,13 +20,14 @@ def compress_image(infile, mb=500, step=10, quality=80):
     """
     o_size = os.path.getsize(infile) / 1024
     # print(f'  > 原始大小：{o_size}')
+    # 大小满足要求，直接返回字节流
     if o_size <= mb:
         with open(infile, 'rb') as f:
             content = f.read()
-        return content  # 大小满足要求，直接返回字节流
-
+        return content
+    # 兼容处理 png 和 jpg
     im = Image.open(infile)
-    im = im.convert("RGB")  # 兼容处理png和jpg
+    im = im.convert("RGB")
 
     while o_size > mb:
         out = BytesIO()
