@@ -1,9 +1,13 @@
 # -*- codeing = utf-8 -*-
+import binascii
 import queue
 import socket
+import sys
 import threading
 import cv2
 import numpy as np
+import crcmod
+from udp_video.util import GetHostIP
 
 # 定义消息队列，用于存储生产者发送的数据和消费者接收的数据
 msg_queue = queue.Queue()
@@ -19,10 +23,13 @@ class server(threading.Thread):
         # 建立 udp 连接
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.bind(self.address)
-        while True:
-            data, addr = s.recvfrom(800000)
-            # 存放数据到消息队列
-            msg_queue.put((data, addr))
+        try:
+            while True:
+                data, addr = s.recvfrom(800000)
+                # 存放数据到消息队列
+                msg_queue.put((data, addr))
+        finally:
+            s.close()
 
     def run(self):
         self.receive_save()
@@ -40,11 +47,19 @@ class consumer(threading.Thread):
     def run(self):
         # 线程运行的方法，循环从消息队列中取出数据并处理
         # images = []
-        v = cv2.VideoWriter('../video/cam-10.avi', cv2.VideoWriter_fourcc(*'XVID'), 10.0, (640, 480), True)
+        v = cv2.VideoWriter('../video/cam-10.avi', cv2.VideoWriter_fourcc(*'XVID'), 20.0, (640, 480), True)
         while msg_queue.not_empty:
             # 从消息队列中消费数据, 返回一个元组(data, addr)
             data, addr = msg_queue.get()
-            # print("data.length= ", len(data))
+            # print(type(data))  # -bytes
+            print("data = ", bin(int.from_bytes(data, byteorder=sys.byteorder)))
+
+            # -----------------加密模块---------------------------#
+            # 加密后的数据---0b100110000010001110110110111
+            after_crc_32 = binascii.crc32(data) & 0xffffffff
+            print("after crc-32 = ", bin(after_crc_32))
+            crcmod_crc32 = crcmod.mkCrcFun(0x104C11DB7, initCrc=0, xorOut=0xffffffff)
+            print("after crcmod-32 = ", bin(crcmod_crc32(data)))
             # 处理数据
             np_arr = np.frombuffer(data, np.uint8)
             img_decode = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
@@ -60,12 +75,11 @@ class consumer(threading.Thread):
             # 计算fps：fps = 1000 / x
             c = cv2.waitKey(20)
             if c == 27:  # 按了 esc 后可以退出
-                exit(0)
+                sys.exit(0)
 
 
 if __name__ == '__main__':
-    ip = socket.gethostbyname(socket.gethostname())
-    print("正在监听的ip: ", ip)
+    ip = GetHostIP()
     address = ip, 20388
     # 开启 server 监听并接收数据线程
     server(address).start()
