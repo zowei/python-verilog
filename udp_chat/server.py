@@ -7,7 +7,6 @@ host, port = 'localhost', 10888
 def receive_data():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.bind((host, port))
-    # data = True
     data_all = b""
     while True:
         # 2048 --- buffer_size 参数为接收的最大数据量

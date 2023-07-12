@@ -48,8 +48,7 @@ class consumer(threading.Thread):
         print(f"{self.name} 线程启动")
 
     def run(self):
-        # 线程运行的方法，循环从消息队列中取出数据并处理
-        # images = []
+        # 线程运行的方法, 循环从消息队列中取出数据并处理
         v = cv2.VideoWriter('../video/cam-10.avi', cv2.VideoWriter_fourcc(*'XVID'), 20.0, (640, 480), True)
         while msg_queue.not_empty:
             # 从消息队列中消费数据, 返回一个元组(data, addr)
@@ -66,8 +65,8 @@ class consumer(threading.Thread):
             crcmod_crc32 = crcmod.mkCrcFun(0x104C11DB7, initCrc=0, xorOut=0xffffffff)
             print("after crcmod-32 = ", hex(crcmod_crc32(data)))
             # 处理数据
-            np_arr = np.frombuffer(data, np.uint8)
-            img_decode = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+            image = np.frombuffer(data, np.uint8)
+            img_decode = cv2.imdecode(image, cv2.IMREAD_COLOR)
 
             # 一帧一帧保存图片成视频
             v.write(cv2.resize(img_decode, (640, 480)))

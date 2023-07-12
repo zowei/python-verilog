@@ -1,7 +1,6 @@
 import socket
 import struct
 import time
-
 from udp_image.util import compress_image
 
 host = 'localhost'

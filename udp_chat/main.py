@@ -1,5 +1,5 @@
-import socket
 # -*- coding: utf-8 -*-
+import socket
 import numpy as np
 from urllib import request
 import cv2
