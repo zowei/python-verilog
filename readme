@@ -1,5 +1,3 @@
-
-
 # 安装 opencv-python
 conda install py-opencv
 
